@@ -2,59 +2,63 @@
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 
-it('fails to register a user with missing required fields', function () {
-    $response = postJson('/api/v1/users', [
-        'name' => 'Alice',
-        // Missing email, phone, position_id, and photo
-    ]);
+dataset('invalid users', [
+    'missing required fields' => [[]],
+    'invalid email' => [['email' => 'invalid-email']],
+    'existing email' => [['email' => 'existing@mail.com', 'phone' => '380500740599']],
+    'invalid phone' => [['phone' => '1234567890']],
+    'invalid position_id' => [['position_id' => 'invalid']],
+    'large photo' => [['photo' => UploadedFile::fake()->image('photo.jpg', 100, 100)->size(6000)]],
+]);
 
-    $response->assertStatus(422)
-        ->assertJson([
-            'success' => false,
-            'message' => 'Validation failed',
-        ]);
-});
+dataset('tokens', [
+    'missing token' => [null],
+    'expired token' => ['expired_token_example'],
+]);
 
-it('fails to register a user with invalid email', function () {
-    $response = postJson('/api/v1/users', [
+function postUser(array $overrides = [], ?string $token = 'valid_token'): TestResponse
+{
+    $defaultData = [
         'name' => 'Alice',
-        'email' => 'invalid-email',
-        'phone' => '380500740599',
+        'email' => 'alice.fonk@mail.com',
+        'phone' => '+380500740599',
         'position_id' => 1,
-        'photo' => UploadedFile::fake()->image('photo.jpg', 100, 100)->size(1000),
-    ]);
+        'photo' => UploadedFile::fake()->image('photo.jpg', 100, 100),
+    ];
 
-    $response->assertStatus(422)
-        ->assertJson([
-            'success' => false,
-            'message' => 'Validation failed',
-        ]);
+    return postJson('/api/v1/users', array_merge($defaultData, $overrides), [
+        'Token' => $token,
+    ]);
+}
+
+
+it('fails to register a user with invalid data')
+    ->with('invalid_users')
+    ->tap(fn ($data) => postUser($data))
+    ->assertStatus(422)
+    ->assertJson(['success' => false, 'message' => 'Validation failed']);
+
+it('registers a new user successfully', function () {
+    Storage::fake('photos');
+
+    postUser()
+        ->assertStatus(201)
+        ->assertJson(['success' => true, 'message' => 'New user successfully registered']);
 });
 
 it('fails to register a user with existing email or phone', function () {
-    // Assuming a user with this email or phone already exists
-    $response = postJson('/api/v1/users', [
-        'name' => 'Alice',
-        'email' => 'existing@mail.com',
-        'phone' => '380500740599',
-        'position_id' => 1,
-        'photo' => UploadedFile::fake()->image('photo.jpg', 100, 100)->size(1000),
-    ]);
-
-    $response->assertStatus(409)
-        ->assertJson([
-            'success' => false,
-            'message' => 'User with this phone or email already exist',
-        ]);
+    postUser(['email' => 'existing@mail.com'])
+        ->assertStatus(409)
+        ->assertJson(['success' => false, 'message' => 'User with this phone or email already exist']);
 });
 
 it('retrieves a list of users', function () {
-    $response = getJson('/api/v1/users');
-
-    $response->assertStatus(200)
+    getJson('/api/v1/users')
+        ->assertStatus(200)
         ->assertJsonStructure([
             'success',
             'page',
@@ -62,177 +66,30 @@ it('retrieves a list of users', function () {
             'total_users',
             'count',
             'links',
-            'users' => [
-                '*' => [
-                    'id',
-                    'name',
-                    'email',
-                    'phone',
-                    'position_id',
-                    'position',
-                    'photo',
-                ],
-            ],
+            'users' => [['id', 'name', 'email', 'phone', 'position_id', 'position', 'photo']],
         ]);
 });
 
 it('returns 404 if the page does not exist', function () {
-    $response = $this->getJson('/api/v1/users?page=9999');
-
-    $response->assertStatus(404)
-        ->assertJson([
-            'success' => false,
-            'message' => 'Page not found',
-        ]);
+    getJson('/api/v1/users?page=9999')
+        ->assertStatus(404)
+        ->assertJson(['success' => false, 'message' => 'Page not found']);
 });
 
 it('retrieves a user by id', function () {
-    $userId = 1; // Assuming a user with this ID exists
-
-    $response = getJson("/api/v1/users/{$userId}");
-
-    $response->assertStatus(200)
-        ->assertJsonStructure([
-            'success',
-            'user' => [
-                'id',
-                'name',
-                'email',
-                'phone',
-                'position_id',
-                'position',
-                'photo',
-            ],
-        ]);
+    getJson('/api/v1/users/1')
+        ->assertStatus(200)
+        ->assertJsonStructure(['success', 'user' => ['id', 'name', 'email', 'phone', 'position_id', 'position', 'photo']]);
 });
 
 it('fails to retrieve a user with non-existent id', function () {
-    $userId = 9999; // Assuming no user with this ID exists
-
-    $response = getJson("/api/v1/users/{$userId}");
-
-    $response->assertStatus(404)
-        ->assertJson([
-            'success' => false,
-            'message' => 'User not found',
-        ]);
+    getJson('/api/v1/users/9999')
+        ->assertStatus(404)
+        ->assertJson(['success' => false, 'message' => 'User not found']);
 });
 
-it('registers a new user successfully', function () {
-    Storage::fake('photos');
-
-    $response = $this->postJson('/api/v1/users', [
-        'name' => 'Alice',
-        'email' => 'alice.fonk@mail.com',
-        'phone' => '380500740599',
-        'position_id' => 1,
-        'photo' => UploadedFile::fake()->image('photo.jpg', 100, 100)->size(5000),
-    ]);
-
-    $response->assertStatus(201)
-        ->assertJson([
-            'success' => true,
-            'message' => 'New user successfully registered',
-        ]);
-});
-
-it('validates user name length', function () {
-    $shortNameResponse = $this->postJson('/api/users', [
-        'name' => 'A',
-        'email' => 'alice.fonk@mail.com',
-        'phone' => '+380500740599',
-        'position_id' => 1,
-        'photo' => UploadedFile::fake()->image('avatar.jpg', 100, 100),
-    ]);
-
-    $shortNameResponse->assertStatus(422)
-        ->assertJsonValidationErrors(['name']);
-
-    $longNameResponse = $this->postJson('/api/users', [
-        'name' => str_repeat('A', 61),
-        'email' => 'alice.fonk@mail.com',
-        'phone' => '+380500740599',
-        'position_id' => 1,
-        'photo' => UploadedFile::fake()->image('avatar.jpg', 100, 100),
-    ]);
-
-    $longNameResponse->assertStatus(422)
-        ->assertJsonValidationErrors(['name']);
-});
-
-it('requires a phone number starting with +380', function () {
-    $response = $this->postJson('/api/users', [
-        'name' => 'Alice',
-        'email' => 'alice.fonk@mail.com',
-        'phone' => '1234567890',
-        'position_id' => 1,
-        'photo' => UploadedFile::fake()->image('avatar.jpg', 100, 100),
-    ]);
-
-    $response->assertStatus(422)
-        ->assertJsonValidationErrors(['phone']);
-});
-
-it('requires a valid position_id', function () {
-    $response = $this->postJson('/api/users', [
-        'name' => 'Alice',
-        'email' => 'alice.fonk@mail.com',
-        'phone' => '+380500740599',
-        'position_id' => 'invalid',
-        'photo' => UploadedFile::fake()->image('avatar.jpg', 100, 100),
-    ]);
-
-    $response->assertStatus(422)
-        ->assertJsonValidationErrors(['position_id']);
-});
-
-it('validates photo constraints', function () {
-    $largePhoto = UploadedFile::fake()->image('avatar.jpg')->size(6000);
-
-    $response = $this->postJson('/api/users', [
-        'name' => 'Alice',
-        'email' => 'alice.fonk@mail.com',
-        'phone' => '+380500740599',
-        'position_id' => 1,
-        'photo' => $largePhoto,
-    ]);
-
-    $response->assertStatus(422)
-        ->assertJsonValidationErrors(['photo']);
-});
-
-it('returns 401 if the token is missing', function () {
-    $response = $this->postJson('/api/users', [
-        'name' => 'Alice',
-        'email' => 'alice.fonk@mail.com',
-        'phone' => '+380500740599',
-        'position_id' => 1,
-        'photo' => UploadedFile::fake()->image('avatar.jpg', 100, 100),
-    ]);
-
-    $response->assertStatus(401)
-        ->assertJson([
-            'success' => false,
-            'message' => 'The token expired.',
-        ]);
-});
-
-it('returns 401 if the token is expired', function () {
-    $expiredToken = 'expired_token_example';
-
-    $response = $this->postJson('/api/users', [
-        'name' => 'Alice',
-        'email' => 'alice.fonk@mail.com',
-        'phone' => '+380500740599',
-        'position_id' => 1,
-        'photo' => UploadedFile::fake()->image('avatar.jpg', 100, 100),
-    ], [
-        'Token' => $expiredToken
-    ]);
-
-    $response->assertStatus(401)
-        ->assertJson([
-            'success' => false,
-            'message' => 'The token expired.',
-        ]);
-});
+it('returns 401 if the token is invalid')
+    ->with('tokens')
+    ->tap(fn ($token) => postUser([], $token))
+    ->assertStatus(401)
+    ->assertJson(['success' => false, 'message' => 'The token expired']);
