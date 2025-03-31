@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BaseCollection;
 use App\Http\Services\BaseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Gate;
 
 abstract class BaseApiController extends Controller
 {
-    protected string|false $collectionClass = false;
+    protected string|false $collectionClass = BaseCollection::class;
     protected string $resourceClass;
     protected BaseService $service;
     protected bool $pagination = true;

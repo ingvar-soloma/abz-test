@@ -2,18 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Models\Position;
+use App\Models\Positions;
 use Illuminate\Database\Seeder;
 
 class PositionSeeder extends Seeder
 {
 
-    public function run(): void
+    final public function run(): void
     {
-        $positions = ['Lawyer', 'Content manager', 'Security', 'Designer'];
-
-        foreach ($positions as $position) {
-            Position::firstOrCreate(['name' => $position]);
-        }
+        Positions::insert([
+            ['name' => 'Lawyer'],
+            ['name' => 'Content manager'],
+            ['name' => 'Security'],
+            ['name' => 'Designer'],
+        ]);
     }
 }

@@ -14,4 +14,6 @@ class PositionResource extends JsonResource
 
         return array_merge($data, []);
     }
+
+
 }
