@@ -21,9 +21,11 @@ class CheckTokenExpiration
 
         $accessToken = PersonalAccessToken::findToken($token);
 
-        if (!$accessToken || Carbon::parse($accessToken->created_at)->addHours(1)->isPast()) {
+        if (!$accessToken || Carbon::parse($accessToken->created_at)->addMinutes(40)->isPast()) {
             return response()->json(['success' => false, 'message' => self::THE_TOKEN_EXPIRED], 401);
         }
+
+        $accessToken->delete();
 
         return $next($request);
     }
