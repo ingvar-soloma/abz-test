@@ -3,7 +3,6 @@
 namespace App\Http\Repositories;
 
 use App\Models\User;
-use Illuminate\Support\Collection;
 
 class UserRepository extends BaseRepository
 {
