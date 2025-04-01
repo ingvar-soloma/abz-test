@@ -25,8 +25,6 @@ class CheckTokenExpiration
             return response()->json(['success' => false, 'message' => self::THE_TOKEN_EXPIRED], 401);
         }
 
-        $accessToken->delete();
-
         return $next($request);
     }
 }

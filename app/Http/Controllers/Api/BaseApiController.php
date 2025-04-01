@@ -29,11 +29,16 @@ abstract class BaseApiController extends Controller
         };
     }
 
+    protected function getStoreResource(): string
+    {
+        return $this->resourceClass;
+    }
+
     // Implement common CRUD operations using abstract methods
-    final public function store(Request $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
         $this->service = $this->getService();
-        Gate::authorize('create', $this->service->getModel());
+//        Gate::authorize('create', $this->service->getModel());
 
         $requestClass = $this->getRequestClass(__FUNCTION__);
         $validated = app($requestClass)->validated();
@@ -42,7 +47,7 @@ abstract class BaseApiController extends Controller
         $model = $this->service->store($validated);
         $model->load($with);
 
-        $resourceClass = $this->resourceClass;
+        $resourceClass = $this->getStoreResource();
         return response()->json(new $resourceClass($model), 201);
     }
 
@@ -77,7 +82,9 @@ abstract class BaseApiController extends Controller
         $model->load($with);
 
         $resourceClass = $this->resourceClass;
-        return response()->json(new $resourceClass($model));
+        $modalName = strtolower(class_basename($model));
+        return response()->json(['success' => true, $modalName => new $resourceClass($model)]
+        );
     }
 
     /**
@@ -96,7 +103,8 @@ abstract class BaseApiController extends Controller
         $model->load($with);
 
         $resourceClass = $this->resourceClass;
-        return response()->json(new $resourceClass($model));
+        $modalName = strtolower(class_basename($model));
+        return response()->json(['success' => true, $modalName => new $resourceClass($model)]);
     }
 
     /**

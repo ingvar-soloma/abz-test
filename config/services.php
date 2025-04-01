@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'tinify' => [
+        'key' => env('TINYPNG_API_KEY'),
+    ],
+
 ];

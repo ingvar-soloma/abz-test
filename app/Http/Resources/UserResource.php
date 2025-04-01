@@ -10,7 +10,8 @@ class UserResource extends JsonResource
     {
         $data = parent::toArray($request);
 
-
-        return array_merge($data, []);
+        return array_merge($data, [
+            'position' => $this->position->name,
+            'photo' => $this->photo ? asset("storage/photos/{$this->photo}") : null,]);
     }
 }
