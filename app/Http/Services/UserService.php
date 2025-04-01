@@ -3,7 +3,9 @@
 namespace App\Http\Services;
 
 use App\Http\Repositories\UserRepository;
+use App\Jobs\OptimizePhotoJob;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Laravel\Sanctum\PersonalAccessToken;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -19,13 +21,12 @@ class UserService extends BaseService
 
     final public function registerUser(array $validated, string $token): Model
     {
-        $this->processPhoto($validated);
+        $this->storeTemporaryPhoto($validated);
 
         $user = $this->repository->create($validated);
 
-        if ($user) {
-            $this->destroyRegistrationToken($token);
-        }
+        $this->destroyRegistrationToken($token);
+        $this->processPhoto($validated, $user->id);
 
         return $user;
     }
@@ -46,10 +47,14 @@ class UserService extends BaseService
         return $userPaginator;
     }
 
-    private function processPhoto(array &$validated): void
+    private function storeTemporaryPhoto(array &$validated): void
     {
-        $photo = $validated['photo'];
-        $validated['photo'] = $this->tinyPngService->processAndOptimizePhoto($photo);
+        $validated['photo'] = $this->tinyPngService->storeTemporaryPhoto($validated['photo']);
+    }
+
+    private function processPhoto(array $validated, int $userId): void
+    {
+        OptimizePhotoJob::dispatch($validated['photo'], $userId);
     }
 
     private function destroyRegistrationToken(string $token): void

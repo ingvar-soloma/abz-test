@@ -4,7 +4,6 @@ namespace App\Http\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Tinify\Tinify;
 use function Tinify\fromFile;
 
 class TinyPngService
@@ -14,16 +13,18 @@ class TinyPngService
         \Tinify\setKey(config('services.tinify.key'));
     }
 
-    public function processAndOptimizePhoto(UploadedFile $photo): string
+    final public function storeTemporaryPhoto(UploadedFile $photo): string
     {
-        // 📌 1. Save the photo to the temporary folder
         $tempPath = 'photos/temp_' . time() . '.jpg';
         Storage::disk('public')->put($tempPath, file_get_contents($photo));
 
-        // 📌 2. Optimize and resize the photo
+        return $tempPath;
+    }
+
+    final public function processAndOptimizePhoto(string $tempPath): string
+    {
         $optimizedPath = $this->optimizeAndResizeWithTinyPNG($tempPath);
 
-        // 📌 3. Delete the temporary photo
         Storage::disk('public')->delete($tempPath);
 
         return $optimizedPath;
