@@ -43,22 +43,16 @@
     </v-container>
 </template>
 
-<script>
+<script setup>
 import { useUserStore } from '@/stores/userStore';
 import { storeToRefs } from 'pinia';
 
-export default {
-    setup() {
-        const userStore = useUserStore();
-        const { users, page, totalPages, loading } = storeToRefs(userStore);
-        const { fetchUsers } = userStore;
+const userStore = useUserStore();
+const { users, page, totalPages, loading } = storeToRefs(userStore);
+const { fetchUsers } = userStore;
 
-        // Fetch users on mount
-        fetchUsers();
-
-        return { users, page, totalPages, loading, fetchUsers };
-    }
-};
+// Fetch users on mount
+fetchUsers();
 </script>
 
 <style scoped>

@@ -49,8 +49,7 @@ class UserService extends BaseService
     private function processPhoto(array &$validated): void
     {
         $photo = $validated['photo'];
-        $validated['photo_path'] = $this->tinyPngService->processAndOptimizePhoto($photo);
-        unset($validated['photo']);
+        $validated['photo'] = $this->tinyPngService->processAndOptimizePhoto($photo);
     }
 
     private function destroyRegistrationToken(string $token): void

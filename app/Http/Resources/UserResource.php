@@ -12,6 +12,6 @@ class UserResource extends JsonResource
 
         return array_merge($data, [
             'position' => $this->position->name,
-            'photo' => $this->photo ? asset("storage/photos/{$this->photo}") : null,]);
+            'photo' => $this->photo ? asset("storage/{$this->photo}") : null,]);
     }
 }

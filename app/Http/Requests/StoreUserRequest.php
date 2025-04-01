@@ -28,6 +28,7 @@ class StoreUserRequest extends FormRequest
         return [
             'email.unique' => self::USER_WITH_THIS_PHONE_OR_EMAIL_ALREADY_EXIST,
             'phone.unique' => self::USER_WITH_THIS_PHONE_OR_EMAIL_ALREADY_EXIST,
+            'phone.regex' => 'The phone number must be in the format +380XXXXXXXXX',
         ];
     }
 
@@ -51,6 +52,7 @@ class StoreUserRequest extends FormRequest
         throw new HttpResponseException(response()->json([
             'success' => false,
             'message' => 'Validation failed',
+            'fails' => $errors,
         ], 422));
     }
 
