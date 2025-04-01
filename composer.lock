@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1089ed34766f3be025e2e9e72d626b17",
+    "content-hash": "6cc87a0cf435cab84ebbe114a1b6c040",
     "packages": [
         {
             "name": "brick/math",
@@ -5634,6 +5634,66 @@
             "time": "2024-12-21T16:25:41+00:00"
         },
         {
+            "name": "tinify/tinify",
+            "version": "1.6.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tinify/tinify-php.git",
+                "reference": "8386ac9b5d4068640ad9756a897ccd162597b8c1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tinify/tinify-php/zipball/8386ac9b5d4068640ad9756a897ccd162597b8c1",
+                "reference": "8386ac9b5d4068640ad9756a897ccd162597b8c1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "lib-curl": ">=7.20.0",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5 || ^7.5 || ^8.4 || ^9.3"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/Tinify.php",
+                    "lib/Tinify/Exception.php"
+                ],
+                "psr-4": {
+                    "Tinify\\": "lib/Tinify/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rolf Timmermans",
+                    "email": "rolftimmermans@voormedia.com"
+                }
+            ],
+            "description": "PHP client for the Tinify API. Tinify compresses your images intelligently. Read more at https://tinify.com.",
+            "homepage": "https://tinify.com/developers",
+            "keywords": [
+                "api",
+                "compress",
+                "images",
+                "tinify",
+                "tinyjpg",
+                "tinypng"
+            ],
+            "support": {
+                "email": "support@tinify.com",
+                "issues": "https://github.com/tinify/tinify-php/issues",
+                "source": "https://github.com/tinify/tinify-php/tree/1.6.2"
+            },
+            "time": "2025-01-27T15:41:06+00:00"
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.6.1",
             "source": {
@@ -6294,67 +6354,6 @@
                 "source": "https://github.com/Jean85/pretty-package-versions/tree/2.1.1"
             },
             "time": "2025-03-19T14:43:43+00:00"
-        },
-        {
-            "name": "laravel/breeze",
-            "version": "v2.3.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/laravel/breeze.git",
-                "reference": "390cbc433cb72fa6050965000b2d56c9ba6fd713"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/laravel/breeze/zipball/390cbc433cb72fa6050965000b2d56c9ba6fd713",
-                "reference": "390cbc433cb72fa6050965000b2d56c9ba6fd713",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/console": "^11.0|^12.0",
-                "illuminate/filesystem": "^11.0|^12.0",
-                "illuminate/support": "^11.0|^12.0",
-                "illuminate/validation": "^11.0|^12.0",
-                "php": "^8.2.0",
-                "symfony/console": "^7.0"
-            },
-            "require-dev": {
-                "laravel/framework": "^11.0|^12.0",
-                "orchestra/testbench-core": "^9.0|^10.0",
-                "phpstan/phpstan": "^2.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Laravel\\Breeze\\BreezeServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Laravel\\Breeze\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Taylor Otwell",
-                    "email": "taylor@laravel.com"
-                }
-            ],
-            "description": "Minimal Laravel authentication scaffolding with Blade and Tailwind.",
-            "keywords": [
-                "auth",
-                "laravel"
-            ],
-            "support": {
-                "issues": "https://github.com/laravel/breeze/issues",
-                "source": "https://github.com/laravel/breeze"
-            },
-            "time": "2025-03-06T14:02:32+00:00"
         },
         {
             "name": "laravel/pail",
