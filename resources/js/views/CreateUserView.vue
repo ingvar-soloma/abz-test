@@ -1,6 +1,8 @@
 <template>
     <v-container>
-        <h1 class="text-h4 mb-4">Create User</h1>
+        <h1 class="text-h4 mb-4">Create User
+            <slot name="closeButton"></slot>
+        </h1>
 
         <v-alert v-if="store.successMessage" type="success" dismissible>
             {{ store.successMessage }}
@@ -10,7 +12,7 @@
         </v-alert>
 
         <!-- Validation Switch -->
-        <v-switch v-model="enableValidation" label="Enable Validation"></v-switch>
+        <v-switch v-model="enableValidation" label="Enable Frontend Validation"></v-switch>
 
         <!-- Get Token Button -->
         <v-btn color="secondary" :loading="store.loading" @click="getToken()" class="mb-4">

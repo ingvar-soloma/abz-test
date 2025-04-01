@@ -6,8 +6,14 @@ import HomeView from '../views/HomeView.vue'
 const routes = [
     {
         path: '/users',
-        name: 'Users',
-        component: UsersView,
+        component: UsersView, // Parent component (acts as a layout)
+        children: [
+            {
+                path: '', // Empty means default child route ("/users")
+                name: 'UserList',
+                component: UsersView,
+            },
+        ]
     },
     {
         path: '/',
@@ -18,11 +24,6 @@ const routes = [
         name: 'Home',
         component: HomeView,
     },
-    {
-        path: '/users/create',
-        name: 'CreateUser',
-        component: () => import('../views/CreateUserView.vue'),
-    }
 ];
 
 export default createRouter({

@@ -1,10 +1,17 @@
 <template>
     <v-container>
         <v-row justify="center">
-            <v-col cols="12" md="8">
+            <v-col cols="auto">
+                <v-card theme="dark" class="sticky-card scrollable">
+                    <CreateUserView class="">
+                    </CreateUserView>
+                </v-card>
+            </v-col>
+            <v-col sm="auto">
+
                 <v-card>
                     <v-card-title class="text-h5">Users List
-                        <v-btn rounded density="compact" icon="mdi-plus" color="success"/>
+<!--                        <v-btn rounded density="compact" icon="mdi-plus" color="success" @click="showCreateForm=true"/>-->
                     </v-card-title>
                     <v-divider></v-divider>
 
@@ -46,6 +53,7 @@
 <script setup>
 import { useUserStore } from '@/stores/userStore';
 import { storeToRefs } from 'pinia';
+import CreateUserView from "@/views/CreateUserView.vue";
 
 const userStore = useUserStore();
 const { users, page, totalPages, loading } = storeToRefs(userStore);
@@ -62,4 +70,15 @@ fetchUsers();
 .v-avatar img {
     object-fit: cover;
 }
+
+.sticky-card {
+    position: sticky;
+    top: 80px;
+    z-index: 10;
+}
+.scrollable {
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
 </style>
