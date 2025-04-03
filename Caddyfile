@@ -1,0 +1,6 @@
+abz-test-assignment.vikinglingo.online {
+    reverse_proxy abz-app:80
+    handle /* {
+        reverse_proxy abz-app:80
+    }
+}

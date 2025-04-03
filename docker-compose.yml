@@ -1,0 +1,88 @@
+services:
+    app:
+        build:
+            context: ./docker/8.4
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+        image: sail-8.4/app
+        container_name: abz-app
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        environment:
+            WWWUSER: '${WWWUSER}'
+            LARAVEL_SAIL: 1
+        ports:
+            - "8099:80"
+            - "5173:5173" # Vite HMR
+        volumes:
+            - ".:/var/www/html"
+        networks:
+            - abz-sail
+        depends_on:
+            - mysql
+            - caddy
+
+    mysql:
+        image: 'mysql/mysql-server:8.0'
+        container_name: abz-mysql
+        ports:
+            - '3306:3306'
+        environment:
+            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ROOT_HOST: '%'
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ALLOW_EMPTY_PASSWORD: 1
+        volumes:
+            - 'abz-mysql:/var/lib/mysql'
+        networks:
+            - abz-sail
+        healthcheck:
+            test:
+                - CMD
+                - mysqladmin
+                - ping
+                - '-p${DB_PASSWORD}'
+            retries: 3
+            timeout: 5s
+
+    caddy:
+        image: caddy:latest
+        container_name: abz-caddy
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "443:443"
+            - "443:443/udp"
+        volumes:
+            - "./Caddyfile:/etc/caddy/Caddyfile"
+            - "/etc/letsencrypt/live/vikinglingo.online:/etc/letsencrypt/live/vikinglingo.online:ro"
+            - "caddy_data:/data"
+            - "caddy_config:/config"
+        networks:
+            - abz-sail
+
+    queue-worker:
+        build:
+            context: .
+        container_name: abz-queue-worker
+        volumes:
+            - .:/var/www/html
+        networks:
+            - abz-sail
+        command: "php artisan queue:work --daemon"
+
+
+networks:
+    abz-sail:
+        driver: bridge
+
+volumes:
+    abz-mysql:
+        driver: local
+    caddy_config:
+        driver: local
+    caddy_data:
+        driver: local
