@@ -96,7 +96,8 @@ npm run dev
 ## ⏳ Time Spent & Challenges
 
 ⏳ Hours Spent:
-- 21 hours
+- Development: 21 hours
+- Deploying: 6 hours
 
 ### 🤔 Challenges & Solutions
 - Image Processing Delay → Offloaded to a Laravel Queue Job.
@@ -114,6 +115,9 @@ npm run dev
 4. ✅ Frontend Setup Issues
     - Challenge: Faced unexpected issues while installing Vue, configuring Vite, and importing it into a Blade template, even though I had done it multiple times before.
     - Solution: reread the documentation and guides.
+5. ❌ Setting Up SSL Certificates for Vite in Docker.
+    - Challenge: Configuring Vite with SSL in a Dockerized environment was tricky because the default Vite dev server expects HTTP links, and the server uses HTTPS.
+    - Temporary Solution: imported raw links to build files in the Blade template.
 
 ---
 ## 📎 Additional Information
