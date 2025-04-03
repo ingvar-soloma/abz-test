@@ -10,6 +10,7 @@ class StoreUserResource extends JsonResource
     {
         return [
             'success' => true,
+            'user_id' => $this->id,
             'message' => 'New user successfully registered',
         ];
     }

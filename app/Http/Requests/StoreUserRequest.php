@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\EmailValidation;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -15,8 +16,8 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'name' => 'required|string|min:2|max:60',
-            'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required|string|regex:/^\+380\d{9}$/|unique:users',
+            'email' => ['required','string', EmailValidation::class, 'max:255', 'unique:users'],
+            'phone' => 'required|string|regex:/^[\+]{0,1}380([0-9]{9})$/|unique:users',
             'password' => 'required|string|min:8',
             'position_id' => 'required|integer|exists:positions,id',
             'photo' => 'required|file|image|mimes:jpeg,jpg|dimensions:min_width=70,min_height=70|max:5120',
@@ -28,7 +29,7 @@ class StoreUserRequest extends FormRequest
         return [
             'email.unique' => self::USER_WITH_THIS_PHONE_OR_EMAIL_ALREADY_EXIST,
             'phone.unique' => self::USER_WITH_THIS_PHONE_OR_EMAIL_ALREADY_EXIST,
-            'phone.regex' => 'The phone number must be in the format +380XXXXXXXXX',
+            'phone.regex' => 'The phone number must be in the format (+)380XXXXXXXXX',
         ];
     }
 
